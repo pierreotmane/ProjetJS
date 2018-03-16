@@ -1,0 +1,13 @@
+Application Js server = front
+
+CryptoMonnaie
+
+1) 
+
+API => afficher le cours des cryptos
+https://www.cryptocompare.com/api/#api-data-price-highcharts
+
+2)
+passer des transactions
+afficher un inventaire
+affichage de la valeur du portefeuille dans le temps

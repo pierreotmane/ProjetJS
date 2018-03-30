@@ -12,6 +12,24 @@ passer des transactions
 afficher un inventaire
 affichage de la valeur du portefeuille dans le temps
 
-ADRIEN OTMANE & PIERRE DEFINGS
+3) Rendu
+	- olivier.heguy@andil.fr
+	archive/lien
+	nom des participants
+	application => setup
 
-test branche
+https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG
+
+mongodb <=> api (nodejs) <=> html (jquery)
+
+http://localhost:3000/api/setup
+http://localhost:3000/api/BTC => cours du bitcoin
+http://localhost:3000/api/ETH => cours de l'ethereum
+http://localhost:3000/api/BTC/123456789 => valeur du BTC à la date 123456789 (exemple)
+
+http://localhost/fonds.html => jquery ajax pour aller chercher les données dans http://localhost:3000/api/BTC
+
+
+2) gestion d'un portefeuille virtuel :
+achat vente de crypto / valorisation du portefeuille virtuel
+http://localhost:3000/api/transactions/1

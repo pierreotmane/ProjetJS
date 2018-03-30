@@ -32,34 +32,48 @@ MongoClient.connect("mongodb://localhost:27017", function(err,client){
 		app.route('/setup')
 			.get(function(req,res,next){
 
-
-				axios({  
-					method:'get',
-  					url:'https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
- 					 responseType:'json'})
-				//axios.get('https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG')
+				var urlTab = ['https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
+								'https://min-api.cryptocompare.com/data/histoday?fsym=ETH&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
+								'https://min-api.cryptocompare.com/data/histoday?fsym=BTS&tsym=USD&limit=60&aggregate=3&e=CCCAGG'];
+				for(i=0;i<urlTab.length;i++){
+					axios.get(urlTab[i])
 				  .then(function (req) {
-				    console.log(req);
-				    console.log(req.data.Data);
-				    console.log(req.data.Response);
-				    console.log('------------' + req.status);
+				    
+				    
 				    var data2 = req.data.Data;
         			var values = new Array();
 
+    				var separateur = ['=','&'];
+					var lien = req.config.url;
+					
+					
+					var nomMonnaie = lien.split(new RegExp(separateur.join('|'),'g'));
+
+					
+
+					var time = []
+					var close = [];
            			for(var i =0; i<data2.length; i++) {
-              			//values.push([element.time*1000, element.close]);
-              			console.log(data2[i].time*1000)
-              			console.log(data2[i].close)
-              			var btcVal = {
-							time:data2[i].time*1000,
-							close : data2[i].close
-						}
-						db.collection('BTC').insert(btcVal);
+              			time[i] = data2[i].time*1000;
+          				close[i] = data2[i].close;
             		}
+
+            		var btcVal = {
+              				name:nomMonnaie[1], 
+							time:time,
+							close : close
+						}
+					db.collection('portemonnaie').insert(btcVal);
 				  })
 				  .catch(function (error) {
 				    console.log(error);
 				  });
+				}
+				
+				
+
+
+
 
 				/*request('', function (error, response, body) {
 			    if (!error && response.statusCode == 200) {

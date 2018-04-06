@@ -1,14 +1,27 @@
 module.exports = function(app,db){
 
-var urlCollection = db.collection('BTC');
+var urlCollection = db.collection('portemonnaie');
 
 
-
-	app.route('/api/BTC')
+	app.route('/api/name')
 	.get(function(req, res, next){
+		console.log('test');
+		urlCollection.find().project({name: 1, _id: 0}).toArray(function(err, result){
+			if(err)
+				res.send(err);
+			else{
+				res.json({
+					status:"200",
+					data: result
+				});
+			}
+		})
+	})
 
-		urlCollection.find({}).toArray
-		(function(err, result){
+
+	app.route('/api/:monnaie')
+	.get(function(req, res, next){
+		urlCollection.findOne({name: req.params.monnaie}, function(err, result){
 			if(err)
 				res.send(err);
 			else{
@@ -16,11 +29,10 @@ var urlCollection = db.collection('BTC');
 					status:"200",
 					data:result
 				});
+
 			}
 		})
-		
-	})
-	.delete(function(req, res, next){
+	}).delete(function(req, res, next){
 
 		urlCollection.deleteMany({},
 		function(err, result){
@@ -35,7 +47,6 @@ var urlCollection = db.collection('BTC');
 		})
 
 	});
-
 
 
 app.route('/api/BTC/:btcDate')

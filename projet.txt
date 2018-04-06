@@ -9,7 +9,9 @@ https://www.cryptocompare.com/api/#api-data-price-highcharts
 
 2)
 passer des transactions
+
 afficher un inventaire
+
 affichage de la valeur du portefeuille dans le temps
 
 3) Rendu

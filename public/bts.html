@@ -1,31 +1,85 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
   	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-    
-</head>
+    <script type="text/javascript" charset="utf-8" async defer>
+    $(function(){
+      $.ajax({
+        method:'get',
+        url:'././api/BTS', //
+        dataType:'JSON'
+      })
+      .done(function(data){
+        
+        var dataBTS = data.data.data;
+        var dataName = data.data.name;
+        console.log(dataBTS);
+        var values = [];
+        console.log(dataBTS.length)
+        for(var i =0; i<dataBTS.length;i++){
+          values.push([dataBTS[i].time, dataBTS[i].close]);
+        }
+        console.log(values);
 
+        Highcharts.stockChart('container', {
+            rangeSelector: {
+                selected: 1
+            },
+
+            title: {
+                text: dataName
+            },
+
+            series: [{
+                name: dataName,
+                data: values,
+                tooltip: {
+                valueDecimals: 2
+                }
+            }]
+          });
+      })
+      .fail(function(){
+      });
+      /*$.getJSON(
+      'https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
+        function (data) {
+
+            var data2 = data['Data'];
+            var values = new Array();
+
+            
+            data2.forEach( function(element) {
+              values.push([element.time*1000, element.close]);
+              console.log(element.time*1000)
+              console.log(element.close)
+            });
+              
+          
+
+        });*/
+    });
+	</script>
+
+</head>
 <body>
- <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">Navbar</a>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="index.html">Navbar</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
 
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <a class="nav-link" href="setup">Setup</a>
-      </li>
       <li class="nav-item dropdown">
         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Cours de la monnaie
@@ -41,25 +95,6 @@
    
   </div>
 </nav>
-
-<div id="app">
-    <div class="form-group col-md-4">
-      <label for="inputState">Monnaies</label>
-      <select id="inputState" v-model="monnaie" @change="afficherChart(monnaie)" class="form-control">
-        <option v-for="n, index in names" >{{n.name}}</option>
-      </select>
-    </div>
-
-    <div id="container">
-      
-    </div>
-</div>
-
-
-<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.15.2/axios.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<script src="script.js"></script>
+<div id="container" style="min-width: 200px; height: 400px; margin: 0 auto"></div>
 </body>
-
 </html>

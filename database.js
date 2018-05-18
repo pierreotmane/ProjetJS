@@ -31,15 +31,17 @@ MongoClient.connect("mongodb://localhost:27017", function(err,client){
 		routers(app,db);
 		
 		app.route('/setup').get(function(req,res,next){
+			db.collection('monnaies').drop();
+
 			db.collection('portemonnaie').drop();
-			db.collection('transaction').drop();
+
 			var urlTab = ['https://min-api.cryptocompare.com/data/histoday?fsym=BTC&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
 							'https://min-api.cryptocompare.com/data/histoday?fsym=ETH&tsym=USD&limit=60&aggregate=3&e=CCCAGG',
 							'https://min-api.cryptocompare.com/data/histoday?fsym=BTS&tsym=USD&limit=60&aggregate=3&e=CCCAGG'];
 			for(i=0;i<urlTab.length;i++) {
 
 				axios.get(urlTab[i]).then(function (req) {
-			    	var data = [];
+			   	var data = [];
 			    
 			    var data2 = req.data.Data;
     			var values = new Array();
@@ -48,7 +50,7 @@ MongoClient.connect("mongodb://localhost:27017", function(err,client){
 				var lien = req.config.url;
 				var nomMonnaie = lien.split(new RegExp(separateur.join('|'),'g'));
 
-				
+				console.log(nomMonnaie[1]);
 				for(var i =0; i<data2.length; i++) {
           			data.push({time : data2[i].time*1000,close : data2[i].close});
         		}
@@ -58,9 +60,19 @@ MongoClient.connect("mongodb://localhost:27017", function(err,client){
           				data : data 
 					}
 
+				var portemonnaie = {
+					name:nomMonnaie[1],
+					data:{
+						"nombre":1250000,
+						"close":data2[60].close
+					},
+					transaction:[]
+						
+				}
+
 				
-				db.collection('portemonnaie').insert(monnaieVal);
-				
+				db.collection('monnaies').insert(monnaieVal);
+				db.collection('portemonnaie').insert(portemonnaie);
 
 			  })
 			  .catch(function (error) {

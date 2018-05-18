@@ -1,12 +1,13 @@
 module.exports = function(app,db){
 
-var urlCollection = db.collection('portemonnaie');
-
+var monnaies = db.collection('monnaies');
+var portemonnaie = db.collection('portemonnaie');
+var transac=[];
 
 	app.route('/api/name')
 	.get(function(req, res, next){
 		console.log('test');
-		urlCollection.find().project({name: 1, _id: 0}).toArray(function(err, result){
+		monnaies.find().project({name: 1, _id: 0}).toArray(function(err, result){
 			if(err)
 				res.send(err);
 			else{
@@ -21,7 +22,7 @@ var urlCollection = db.collection('portemonnaie');
 
 	app.route('/api/:monnaie')
 	.get(function(req, res, next){
-		urlCollection.findOne({name: req.params.monnaie}, function(err, result){
+		monnaies.findOne({name: req.params.monnaie}, function(err, result){
 			if(err)
 				res.send(err);
 			else{
@@ -31,10 +32,10 @@ var urlCollection = db.collection('portemonnaie');
 				});
 
 			}
-		})
+		});
 	}).delete(function(req, res, next){
 
-		urlCollection.deleteMany({},
+		monnaies.deleteMany({},
 		function(err, result){
 			if(err)
 				res.send(err);
@@ -46,6 +47,75 @@ var urlCollection = db.collection('portemonnaie');
 			}
 		})
 
+	})
+	.put(function(req, res, next){
+		portemonnaie.findOne({name: req.params.monnaie}, function(err, result){
+			var transac = result.transaction;
+			var nombre = result.data.nombre;
+			var close = result.data.close;
+			console.log(transac);
+			var monnaie = req.body.nbmonnaie;
+			var typeTransaction = req.body.value;
+			console.log(typeTransaction);
+			var data;
+			if(!monnaie == 0){
+				if(typeTransaction == 'achat'){
+					if(monnaie<=result.data.nombre){
+						console.log('create data');
+						data = {
+							name: typeTransaction,
+							ancienPM:result.data.nombre,
+							nombreAchete: monnaie * result.data.close
+						}
+						console.log(data);
+						nombre -= (monnaie * result.data.close);
+						console.log('push');
+						transac.push(data);
+						console.log('transac '+transac);
+					}
+				}
+			}
+			
+			portemonnaie.update(
+		 	{name : req.params.monnaie},	
+			{
+				$set:{
+					transaction: transac,
+					data:{
+						nombre : nombre,
+						close : close
+					}
+				}
+			},
+			{upsert:true},
+
+			function(err, result){
+				if(err)
+					res.send(err);
+				else{
+					res.json({
+						status:"200",
+						data:result	
+					});
+				}
+
+			});
+	})});
+
+	app.route('/api/portemonnaie/:monnaie')
+		.get(function(req, res, next){
+		portemonnaie.findOne({name: req.params.monnaie}, function(err, result){
+
+			if(err)
+				res.send(err);
+			else{
+				res.json({
+					status:"200",
+					data:result
+				});
+
+			}
+		});
 	});
 
 
@@ -54,7 +124,7 @@ app.route('/api/BTC/:btcDate')
 
 		var ObjectId = require('mongodb').ObjectId;
 
-		urlCollection.findOne({ _id : new ObjectId(req.params.urlId)},
+		monnaies.findOne({ _id : new ObjectId(req.params.urlId)},
 		function(err, result){
 			if(err)
 				res.send(err);
@@ -67,33 +137,11 @@ app.route('/api/BTC/:btcDate')
 		});
 		
 	})
-	.put(function(req, res, next){
-		var ObjectId = require('mongodb').ObjectId;
-
-		urlCollection.updateOne(
-	 	{_id : new ObjectId(req.params.urlId)},	
-		{
-			$set:{
-				name: req.body.name,
-				path: req.body.path
-			}
-		},
-		function(err, result){
-			if(err)
-				res.send(err);
-			else{
-				res.json({
-					status:"200",
-					data:result	
-				});
-			}
-
-		});
-	})
+	
 	.delete(function(req, res, next){
 		var ObjectId = require('mongodb').ObjectId;
 
-		urlCollection.deleteOne({ _id : new ObjectId(req.params.urlId)},
+		monnaies.deleteOne({ _id : new ObjectId(req.params.urlId)},
 		function(err, result){
 			if(err)
 				res.send(err);
